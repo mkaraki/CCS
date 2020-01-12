@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf8">
+    <title>CCS Connect</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.8/sjcl.min.js"
+        integrity="sha256-nIoG9XIePM1QNttI6KAGLYGNxc4DNinxxmOZW0/Z7uA=" crossorigin="anonymous"></script>
+
+    <script src="connect_script.js"></script>
+</head>
+
+
+<body>
+    <div id="login">
+        <table>
+            <tbody>
+                <tr>
+                    <td><label for="login-server">Server</label></td>
+                    <td><input type="text" class="form-control" id="login-server" /></td>
+                </tr>
+                <tr>
+                    <td><label for="login-user">User</label></td>
+                    <td><input type="text" class="form-control" id="login-user" /></td>
+                </tr>
+                <tr>
+                    <td><label for="login-userpass">User Pass</label></td>
+                    <td><input type="password" class="form-control" id="login-userpass" /></td>
+                </tr>
+                <tr>
+                    <td><label for="login-room">Room</label></td>
+                    <td><input type="text" class="form-control" id="login-room" /></td>
+                </tr>
+                <tr>
+                    <td><label for="login-roompsk">Room PSK</label></td>
+                    <td><input type="password" class="form-control" id="login-roompsk" /></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" onclick="login();">Login</button>
+        <button type="button" tabindex="-1" class="btn btn-danger" onclick="login('http');">Unsecure Login</button>
+        <button type="button" tabindex="-1" class="btn btn-secondary" data-toggle="modal" onclick="create_share();"
+            data-target="#shareModal">Share</button>
+        <button type="button" tabindex="-1" class="btn btn-secondary" data-toggle="modal" onclick="reset_sharekey();"
+            data-target="#shareModal">Open Share</button>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="shareModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>CCS Share Key</p>
+                    <input type="text" class="form-control" id="sharekey" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="apply_share();"
+                        data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chatwindow">
+        <div id="chat-messages">
+        </div>
+
+        <div id="chat-controlbar">
+            <input type="text" class="form-control" id="chat-sendmsg" />
+            <button type="button" class="btn btn-primary" onclick="send_message();">Send</button>
+        </div>
+    </div>
+
+    <script>
+        $('#chatwindow').hide();
+    </script>
+</body>
+
+</html>
