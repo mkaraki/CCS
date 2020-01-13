@@ -166,7 +166,12 @@ function check_newmessage() {
     for (var i = 0; i < d.length; i++) {
         var m = d[i];
 
-        var pure = sjcl.decrypt($('#login-roompsk').val(), m.message);
+        try {
+            var pure = sjcl.decrypt($('#login-roompsk').val(), m.message);
+        }
+        catch{
+            continue;
+        }
 
         add_message(m.user, pure);
     }
@@ -175,7 +180,7 @@ function check_newmessage() {
 
 function request_sendmessage(url, room, user, message, psk) {
     var msg = encodeURI(sjcl.encrypt(psk, message));
-    var data = download_sync(url + `?room=${room}&user=${user}&msg=${msg}`, 'GET');
+    download_sync(url + `?room=${room}&user=${user}&msg=${msg}`, 'GET');
 }
 
 function send_message() {
