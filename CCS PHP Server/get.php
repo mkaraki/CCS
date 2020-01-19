@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/SECRET/sqlinit.php';
 header('Access-Control-Allow-Origin: *');
+header("Content-type: application/json; charset=utf-8");
 
 $rid = intval($_GET['room']);
 $from = intval($_GET['from']);
@@ -18,7 +19,7 @@ if ($res = $sql->query("SELECT * FROM ChatLog WHERE id > $from AND room = $rid")
         $obj[] = array(
             "id"=> $i['id'],
             "user"=> $i['user'],
-            "message"=> base64_decode($i['message']),
+            "message"=> $i['message'],
             "time"=> $i['senttime'],
         );
     }

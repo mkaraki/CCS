@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/SECRET/sqlinit.php';
 header('Access-Control-Allow-Origin: *');
+header("Content-type: text/plain; charset=utf-8");
 
 $rid = intval($_GET['room']);
 // $rid = 1;

@@ -56,21 +56,6 @@ function download_sync(url, method) {
         return false;
 }
 
-function download_serverinfo(url) {
-    $.ajax({
-        url: url,
-        type: "GET",
-        data: null,
-        dataType: "json",
-        timespan: 1000
-
-    }).done(function (data) {
-        return data.responseJSON;
-    }).fail(function () {
-        return null;
-    });
-}
-
 function checkform() {
     if ($('#login-server').val() === '' ||
         $('#login-user').val() === '' ||
@@ -104,7 +89,6 @@ function checkjoin(url, roomstr, checkstr, psk) {
 }
 
 var SHARED_serverbaseurl;
-
 
 function login(scheme = 'https') {
     if (!checkform())
@@ -148,18 +132,49 @@ function login(scheme = 'https') {
     $('#login').hide();
     $('#chatwindow').show();
 
-    setInterval(check_newmessage, 1000);
+    SHARED_updatetimer = setInterval(check_newmessage, 1000);
 }
+
+var SHARED_updatetimer;
 
 var SHARED_lastmsgid = 0;
 
-function request_newmsg(url, room, from) {
-    var data = download_sync(url + `?room=${room}&from=${from}`, 'GET');
-    return JSON.parse(data);
+function stop_client(reason) {
+    clearInterval(SHARED_updatetimer);
+    $('#chat-controlbar').hide();
+    add_message("Client", reason);
+    console.error(reason);
+    alert(reason);
 }
 
 function check_newmessage() {
-    var d = request_newmsg(SHARED_serverbaseurl + '/get.php', $('#login-room').val(), SHARED_lastmsgid);
+    var xhr = new XMLHttpRequest();
+    xhr.timeout = 800;
+    xhr.open("GET", SHARED_serverbaseurl + `/get.php?room=${$('#login-room').val()}&from=${SHARED_lastmsgid}`, true);
+    xhr.onload = function (e) {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                handle_newmessage(xhr.responseText);
+            } else {
+                stop_client(`Connection Error (${xhr.statusText})`);
+            }
+        }
+    };
+    xhr.onerror = function (e) {
+        stop_client(`Connection Error (${xhr.statusText})`);
+    };
+    xhr.send(null);
+}
+
+function handle_newmessage(data) {
+    try {
+        var d = JSON.parse(data);
+    }
+    catch (e) {
+        stop_client('FATAL: UNKNOWN Server Message. Tell Administrator "Delete All Message".');
+        return;
+    }
+
     if (d.length < 1) return;
     SHARED_lastmsgid = d[d.length - 1].id;
 
@@ -167,20 +182,25 @@ function check_newmessage() {
         var m = d[i];
 
         try {
-            var pure = sjcl.decrypt($('#login-roompsk').val(), m.message);
+            var pure = sjcl.decrypt($('#login-roompsk').val(), atob(m.message));
         }
-        catch{
+        catch (e) {
+            add_message(`Unknown (Server says ${m.user})`, `Message couldn't decrypt. (Error: ${e})`);
             continue;
         }
 
         add_message(m.user, pure);
     }
-
 }
 
 function request_sendmessage(url, room, user, message, psk) {
-    var msg = encodeURI(sjcl.encrypt(psk, message));
-    download_sync(url + `?room=${room}&user=${user}&msg=${msg}`, 'GET');
+    var enc = sjcl.encrypt(psk, message);
+    var msg = btoa(enc);
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('POST', url);
+    xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    xhr.send(`room=${room}&user=${user}&msg=${msg}`);
 }
 
 function send_message() {
@@ -193,4 +213,8 @@ function add_message(from, message) {
     var item = document.createElement('p');
     item.innerText = from + ': ' + message
     parent.appendChild(item);
+}
+
+function handle_inkey() {
+    if (window.event.keyCode == 13) send_message();
 }

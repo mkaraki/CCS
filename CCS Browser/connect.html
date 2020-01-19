@@ -82,8 +82,17 @@
         </div>
 
         <div id="chat-controlbar">
-            <input type="text" class="form-control" id="chat-sendmsg" />
-            <button type="button" class="btn btn-primary" onclick="send_message();">Send</button>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" onclick="location.reload();">Back</button>
+                </div>
+                <input type="text" class="form-control" id="chat-sendmsg" placeholder="Message"
+                    onkeydown="handle_inkey();">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"
+                        onclick="send_message();">Send</button>
+                </div>
+            </div>
         </div>
     </div>
 
